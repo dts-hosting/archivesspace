@@ -17,15 +17,22 @@ module Searchable
     if !limit.blank?
       default_types = [limit]
     end
+
+    @facet_filter = FacetFilter.new(default_facets, params.fetch(:filter_fields,[]), params.fetch(:filter_values,[]))
+    filter_query = @facet_filter.get_filter_query
+
     @query = ''
     q = nil if q.strip.blank?
     record_types = params.fetch(:recordtypes, nil)
     if record_types
+      record_types_limit = AdvancedQueryBuilder.new
       record_types.each do |type|
-        @query = "primary_type:#{type} #{@query}"
+        record_types_limit.or('primary_type', type)
         @base_search += "&recordtypes[]=#{type}"
       end
-      @query = "publish:true AND (#{@query})"
+
+      filter_query.and(record_types_limit)
+      @query = '*'
     elsif q
       @query = q
       @base_search = "#{@base_search}q=#{q}"
@@ -39,29 +46,28 @@ module Searchable
     res_id = params.fetch(:res_id, '')
     repo_id = params.fetch(:repo_id, '')
     if !res_id.blank?
-      @query = @query != '*' ? "#{@query} AND " : ''
-      @query += "resource:\"#{res_id}\""
+      filter_query.add('resource', res_id)
       @base_search = "#{@base_search}&res_id=#{res_id.gsub('/', '%2f')}"
     elsif !repo_id.blank?
-      @query = @query != '*' ? "#{@query} AND " : ''
-      @query += "repository:\"#{repo_id}\""
+      filter_query.add('repository', repo_id)
       @base_search = "#{@base_search}&repo_id=#{repo_id.gsub('/', '%2f')}"
     end
     years = get_filter_years(params)
     if !years.blank?
-      @query = "#{@query} AND years:[#{years['from_year']} TO #{years['to_year']}]"
+      builder = AdvancedQueryBuilder.new
+      builder.and('years', AdvancedQueryBuilder::RangeValue.new(years['from_year'], years['to_year']), 'range', false, false)
+      filter_query.and(builder)
       @base_search = "#{@base_search}&filter_from_year=#{years['from_year']}&filter_to_year=#{years['to_year']}"
     end
+
     @base_search += "&limit=#{limit}" if !limit.blank?
-#    Rails.logger.debug("SEARCHABLE BASE: #{@base_search}")
     @criteria = default_search_opts
-    @facet_filter = FacetFilter.new(default_facets, params.fetch(:filter_fields, []), params.fetch(:filter_values, []))
     # building the query for the facetting
     type_query_builder = AdvancedQueryBuilder.new
     default_types.reduce(type_query_builder) {|b, type|
       b.or('types', type)
     }
-    @criteria['filter'] = @facet_filter.get_filter_query.and(type_query_builder).build.to_json
+    @criteria['filter'] = filter_query.and('publish', true).and(type_query_builder).build.to_json
     @criteria['facet[]'] = @facet_filter.get_facet_types
     @criteria['page_size'] = params.fetch(:page_size, AppConfig[:pui_search_results_page_size])
   end
@@ -85,14 +91,17 @@ module Searchable
     end
     set_search_statement
     raise I18n.t('navbar.error_no_term') unless @search.has_query?
+
+    @facet_filter = FacetFilter.new(default_facets, @search[:filter_fields],  @search[:filter_values])
+    filter_query = @facet_filter.get_filter_query
+
     have_query = false
     advanced_query_builder = AdvancedQueryBuilder.new
     @search[:q].each_with_index { |query, i|
       query.gsub!(/\[\]/x) { |c| "\\" + c }
-      query = '*' if query.blank?
       have_query = true
       op = @search[:op][i]
-      field = @search[:field][i].blank? ? 'keyword' : @search[:field][i]
+      field = @search[:field][i].blank? ? 'keyword_published' :  @search[:field][i]
       from = @search[:from_year][i] || ''
       to = @search[:to_year][i] || ''
       @base_search += '&' if @base_search.last != '?'
@@ -102,7 +111,7 @@ module Searchable
       builder.and(field, query, 'text', false, op == 'NOT')
       # add year range part of the row
       unless from.blank? && to.blank?
-        builder.and('years', AdvancedQueryBuilder::RangeValue.new(from, to), 'range', false, op == 'NOT')
+        filter_query.and('years', AdvancedQueryBuilder::RangeValue.new(from, to), 'range', false, op == 'NOT')
       end
       # add to the builder based on the op
       if op == 'OR'
@@ -113,29 +122,25 @@ module Searchable
     }
     raise I18n.t('navbar.error_no_term') unless have_query  # just in case we missed something
 
-    filter_query_builder = AdvancedQueryBuilder.new
-
-     # we have to add filtered dates, if they exist
+    # we have to add filtered dates, if they exist
     unless @search[:dates_searched]
       years = get_filter_years(params)
       unless years['from_year'].blank? && years['to_year'].blank?
         builder = AdvancedQueryBuilder.new
         builder.and('years', AdvancedQueryBuilder::RangeValue.new(years['from_year'], years['to_year']), 'range', false, false)
-        filter_query_builder.and(builder)
+        filter_query.and(builder)
         @base_search = "#{@base_search}&filter_from_year=#{years['from_year']}&filter_to_year=#{years['to_year']}"
       end
     end
+
     @criteria = default_search_opts
     @criteria['sort'] = @search[:sort] if @search[:sort]  # sort can be passed as default or via params
     # we have to pass the sort along in the URL
     @sort = @criteria['sort']
-    Rails.logger.debug("SORT: #{@sort}")
-   # if there's an fq passed along...
-    unless @criteria['fq'].blank?
-      @criteria['fq'].each do |fq|
-        f, v = fq.split(":")
-        advanced_query_builder.and(f, v, "text", false, false)
-      end
+
+    # The caller can provide extra filters (in the form of an AdvancedQueryBuilder) to be added in
+    if @criteria['fq']
+      filter_query.and(@criteria['fq'])
     end
 
     unless @criteria['repo_id'].blank?
@@ -147,11 +152,9 @@ module Searchable
         .and('repository', repo_uri, 'uri')
         .or('used_within_published_repository', repo_uri, 'uri')
 
-      advanced_query_builder.and(this_repo)
+      filter_query.and(this_repo)
     end
     @base_search += "&limit=#{@search[:limit]}" unless @search[:limit].blank?
-
-    @facet_filter = FacetFilter.new(default_facets, @search[:filter_fields], @search[:filter_values])
 
     # building the query for the facetting
     type_query_builder = AdvancedQueryBuilder.new
@@ -159,14 +162,15 @@ module Searchable
       b.or('types', type)
     }
 
+    # apply any "search within" clauses
+    @search[:filter_q].each {|v|
+      unless v.blank?
+        advanced_query_builder.and('keyword_published', v, 'text', false, false)
+      end
+    }
+
     @criteria['aq'] = advanced_query_builder.build.to_json
-    @criteria['filter'] = filter_query_builder.and(@facet_filter.get_filter_query.and(type_query_builder)).build.to_json
-
-   # apply any "search within" clauses
-    @criteria['filter_query[]'] = @search[:filter_q].map {|v|
-      v if !v.to_s.empty?
-    }.compact
-
+    @criteria['filter'] = filter_query.and('types', 'pui').and('publish', true).and(type_query_builder).build.to_json
     @criteria['facet[]'] = @facet_filter.get_facet_types
     @criteria['page_size'] = params.fetch(:page_size, AppConfig[:pui_search_results_page_size])
   end
@@ -373,7 +377,7 @@ module Searchable
       else
         condition += I18n.t("search_results.op.#{@search[:op][i]}", :default => "").downcase
       end
-      f = @search[:field][i].blank? ? 'keyword' : @search[:field][i]
+      f = @search[:field][i].blank? ? 'keyword_published' : @search[:field][i]
       condition += ' ' + I18n.t("search_results.#{f}_contain", :kw => CGI::escapeHTML((q == '*' ? I18n.t('search_results.anything') : q)) )
       unless @search[:from_year][i].blank? && @search[:to_year][i].blank?
         from_year = @search[:from_year][i].blank? ? I18n.t('search_results.filter.year_begin') : @search[:from_year][i]

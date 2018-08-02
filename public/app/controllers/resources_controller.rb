@@ -28,7 +28,7 @@ class ResourcesController < ApplicationController
     op: [''],
     field: ['title']
   }
-  DEFAULT_RES_TYPES = %w{pui_archival_object pui_digital_object agent subject}
+  DEFAULT_RES_TYPES = %w{pui_collection pui_archival_object pui_digital_object agent subject}
 
   # present a list of resources.  If no repository named, just get all of them.
   def index
@@ -41,7 +41,7 @@ class ResourcesController < ApplicationController
       @base_search = "/repositories/resources?"
     end
     search_opts = default_search_opts( DEFAULT_RES_INDEX_OPTS)
-    search_opts['fq'] = ["repository:\"/repositories/#{@repo_id}\""] if @repo_id
+    search_opts['fq'] = AdvancedQueryBuilder.new.and('repository', "/repositories/#{@repo_id}") if @repo_id
     DEFAULT_RES_SEARCH_PARAMS.each do |k, v|
       params[k] = v unless params.fetch(k, nil)
     end
@@ -92,6 +92,7 @@ class ResourcesController < ApplicationController
     res_id = "/repositories/#{repo_id}/resources/#{params.require(:id)}"
     search_opts = DEFAULT_RES_SEARCH_OPTS
     search_opts['fq'] = ["resource:\"#{res_id}\""]
+    search_opts['fq'] = AdvancedQueryBuilder.new.and('resource', res_id).or('uri', res_id)
     params[:res_id] = res_id
 #    q = params.fetch(:q,'')
     unless params.fetch(:q, nil)
@@ -295,7 +296,8 @@ class ResourcesController < ApplicationController
       'sort' => 'top_container_u_icusort asc',
       'facet.mincount' => 1
     })
-    search_opts['fq']=[qry]
+    search_opts['fq'] = AdvancedQueryBuilder.new.and('collection_uri_u_sstr', resource_uri).and('types', 'pui').and('types', 'pui_container')
+
     set_up_search(['pui_container'], ['type_enum_s', 'published_series_title_u_sstr'], search_opts, params, qry)
     @base_search= @base_search.sub("q=#{qry}", '')
     page = Integer(params.fetch(:page, "1"))
