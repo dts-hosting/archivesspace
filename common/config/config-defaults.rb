@@ -753,3 +753,15 @@ AppConfig[:use_slug_finding_aid_urls_in_marc_exports] = false
 
 # Turns on representative file version features - still in development
 AppConfig[:enable_representative_file_version] = false
+
+# Display order of resource and archival object notes in the PUI scroll view
+AppConfig[:pui_scroll_view_notes_order] = ['scopecontent',
+                                           'physloc',
+                                           'langmaterial',
+                                           'physdesc',
+                                           'accessrestrict',
+                                           'userestrict',
+                                           'acqinfo',
+                                           'arrangement',
+                                           'originalsloc',
+                                           'relatedmaterial']

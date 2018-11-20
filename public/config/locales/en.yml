@@ -251,6 +251,8 @@ en:
   related_resources: Related Collections
   linked_instances: Linked Records
   linked_digital_objects: Digital Material
+  collection_feed: All records in the collection
+  collection_feed_nav: Navigate to Series
 
   context: Found in
   context_delimiter: "/"
@@ -534,3 +536,6 @@ en:
     staff_interface: <a href="%{staff_url}">Staff Interface</a>
     archivesspace_home: Visit <a href='http://archivesspace.org'>ArchivesSpace.org</a>
     feedback: <a id='aspaceFeedbackLink' href='%{feedback_url}' target='_blank'>Send Feedback or Report a Problem</a>
+
+  collection_organization:
+    return_to_top: Return to top

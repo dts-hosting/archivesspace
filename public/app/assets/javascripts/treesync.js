@@ -26,14 +26,6 @@
 
     self.setupHashChange();
     self.scroller.registerScrollCallback($.proxy(self.handleScroll, this));
-
-    // Sync the tree
-    var tree_id = self.tree_id_from_hash();
-    if (tree_id != null) {
-      self.tree.setCurrentNode(tree_id, function () {
-        self.tree.elt.scrollTo('#' + tree_id, 0, { offset: -50 });
-      });
-    }
   };
 
   TreeSync.prototype.setupHashChange = function () {
@@ -90,17 +82,22 @@
     }
   };
 
-  TreeSync.prototype.SCROLL_TIMEOUT = 500;
+  TreeSync.prototype.SCROLL_TIMEOUT = 100;
   TreeSync.prototype.handleScroll = function () {
     var self = this;
 
     var syncAfterScroll = function () {
-      var $record = self.scroller.getClosestElement();
-      var uri = $record.data('uri');
+      var context = self.scroller.getCurrentContext();
+      var uri = context.uri;
       var tree_id = TreeIds.uri_to_tree_id(uri);
-      self.tree.setCurrentNode(tree_id, function () {
-        self.tree.elt.scrollTo('#' + tree_id, 0, { offset: -50 });
-      });
+
+      self.tree.setCurrentNode(tree_id);
+
+      var current = this.scroller.getClosestElement();
+      if (current) {
+          // retain current scroll state by hacking the history
+          history.replaceState(null, null, document.location.pathname + '#tree::' + TreeIds.uri_to_tree_id(current.data('uri')));
+      }
     };
 
     clearTimeout(this.scrollTimeout);

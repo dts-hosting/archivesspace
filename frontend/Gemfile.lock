@@ -1,5 +1,6 @@
 GEM
   remote: https://rubygems.org/
+  remote: http://rubygems.org/
   specs:
     actioncable (5.2.5)
       actionpack (= 5.2.5)
@@ -322,6 +323,9 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    write_xlsx (0.85.3)
+      rubyzip (>= 1.0.0)
+      zip-zip
     zip-zip (0.3)
       rubyzip (>= 1.0.0)
 
@@ -372,6 +376,7 @@ DEPENDENCIES
   tzinfo-data
   uglifier (= 3.0.4)
   web-console
+  write_xlsx (= 0.85.3)
   zip-zip (= 0.3)
 
 BUNDLED WITH

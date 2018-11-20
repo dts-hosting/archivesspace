@@ -972,6 +972,73 @@ span.head {
   }
 }
 
+// Do not show this to the user
+.honeypot {
+  position: absolute;
+  left: -9999px;
+}
+
+// YALE THINGS
+.feed-container .infinite-record-context {
+}
+
+.feed-container .infinite-record-context .dropdown,
+.feed-container .infinite-record-context .dropdown a#scrollContext,
+.feed-container .infinite-record-context .dropdown .dropdown-menu {
+  width: 100%;
+}
+
+.feed-container .infinite-record-context {
+  .infinite-record-context-resource {
+    display: none;
+  }
+
+  .infinite-record-context-selector {
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  .dropdown a#scrollContext {
+    position: relative;
+    text-align: left;
+    padding: 10px 16px;
+
+    .current-record-title {
+      width: 98%;
+      display: inline-block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .caret {
+      right: 10px;
+      position: absolute;
+      top: 50%;
+      margin-top: -2px;
+    }
+  }
+  .dropdown-menu {
+    overflow: auto;
+  }
+  .dropdown-menu:after {
+    content: ' End of List ';
+    text-align: center;
+    color: #AAA;
+    font-size: 0.8em;
+    border-top: 1px dotted #CCC;
+    width: 90%;
+    margin: 12px 5% 4px;
+    padding: 4px 0;
+    display: block;
+  }
+}
+
+.feed-container .infinite-tree-view .expandme {
+  visibility: hidden;
+}
+
 // Specific styling for Finding Aid Information to override label truncation.
 .dl-horizontal-fa {
   @media (min-width: 768px) {
@@ -998,8 +1065,91 @@ span.head {
   }
 }
 
-// Do not show this to the user
-.honeypot {
-  position: absolute;
-  left: -9999px;
+.infinite-record-context.fixed {
+  margin-top: 60px;
+
+  .infinite-record-context-resource {
+    display: block;
+    background-color: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid #CCC;
+    margin-bottom: 10px;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+    text-decoration: none !important;
+    position: relative;
+
+    @media (max-width: 640px) {
+      padding: 15px 30px 15px 15px !important;
+    }
+
+    .infinite-record-context-resource-title {
+      font-weight: bold;
+      color: #34b6e4;
+      font-size: 1.25rem;
+
+      @media (max-width: 640px) {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+        overflow: hidden;
+        font-size: 18px;
+        line-height: 28px;
+        vertical-align: middle;
+        display: inline-block;
+        font-size: 18px;
+      }
+    }
+
+    .infinite-record-context-resource-back-to-top {
+      float: right;
+      line-height: 30px;
+
+      @media (max-width: 640px) {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        margin-top: -15px;
+
+        span {
+          left: -10000px;
+          position: absolute;
+        }
+      }
+    }
+  }
+
+  .infinite-record-context-affix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+  }
+
+  .infinite-record-context-selector {
+    height: 60px;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+  }
+}
+
+#collection-feed {
+  .infinite-item.infinite-item-archival-object {
+    padding: 5px 20px;
+
+    &.infinite-item-indent-1 {
+      padding: 10px 0;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    dl dt {
+      display: none;
+    }
+    dl dd {
+      margin-left: 0;
+    }
+  }
 }

@@ -182,6 +182,10 @@ class Resource < Record
     json['instances']
   end
 
+  def all_series
+    archives_space_client.get_all_series(uri)
+  end
+
   private
 
   def parse_digital_instance
