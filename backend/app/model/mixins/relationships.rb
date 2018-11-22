@@ -347,7 +347,7 @@ AbstractRelationship = Class.new(Sequel::Model) do
 
   # Return the list of relationships involving any of the records named in
   # 'participant_ids'
-  def self.find_by_participant_ids(participant_model, participant_ids)
+  def self.find_by_participant_ids(participant_model, participant_ids, extra_filters = {})
     result = []
 
     return result if participant_ids.empty?
@@ -357,7 +357,7 @@ AbstractRelationship = Class.new(Sequel::Model) do
 
     return [] if filters.empty?
 
-    self.filter(Sequel.|(*filters)).each do |relationship|
+    extra_filters.fetch(self, self).filter(Sequel.|(*filters)).each do |relationship|
       result << relationship
     end
 
@@ -662,7 +662,7 @@ module Relationships
   module ClassMethods
 
 
-    def calculate_object_graph(object_graph, opts = {})
+    def calculate_object_graph(object_graph, filters = {})
       # For each relationship involving a resource
       self.relationships.each do |relationship_defn|
         # Find any relationship of this type involving any record mentioned in
@@ -671,7 +671,7 @@ module Relationships
         object_graph.each do |model, id_list|
           next unless relationship_defn.participating_models.include?(model)
 
-          linked_relationships = relationship_defn.find_by_participant_ids(model, id_list).map {|row|
+          linked_relationships = relationship_defn.find_by_participant_ids(model, id_list, filters).map {|row|
             row[:id]
           }
 
