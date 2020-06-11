@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get -y install --no-install-recommends \
       build-essential \
       git \
-      openjdk-11-jre-headless \
+      openjdk-11* \
       shared-mime-info \
       wget \
       unzip
