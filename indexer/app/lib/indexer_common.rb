@@ -138,6 +138,13 @@ class IndexerCommon
       doc.each do |key, val|
         if EXCLUDED_STRING_VALUE_PROPERTIES.include?(key) || key =~ /_enum_s$/
           # ignored
+        elsif IndexerCommonConfig.excluded_fields_from_keyword_search.include?(key)
+          # skipped!
+        elsif IndexerCommonConfig.excluded_typed_fields_from_keyword_search.fetch(doc['jsonmodel_type'], []).include?(key)
+          # skipped!
+        elsif published_only && IndexerCommonConfig.excluded_typed_fields_from_public_keyword_search.fetch(doc['jsonmodel_type'], []).include?(key)
+          # skipped!
+        elsif key =~ /_enum_s$/
         elsif val.is_a?(String)
           strings.push(val)
         elsif val.is_a?(Hash)
