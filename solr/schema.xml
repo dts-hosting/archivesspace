@@ -55,6 +55,7 @@
     <field name="ancestors" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="digital_object_type" type="string" indexed="true" stored="true" multiValued="false" />
     <field name="digital_object" type="string" indexed="true" stored="true" multiValued="false" />
+    <field name="has_published_digital_objects" type="boolean" indexed="true" stored="true" multiValued="false" />
     <field name="display_string" type="text_general" indexed="true" stored="true" multiValued="false" />
     <field name="first_term_type" type="string" indexed="true" stored="true" multiValued="false" />
     <field name="finding_aid_title" type="text_general" indexed="true" stored="true" multiValued="false" />
@@ -81,6 +82,7 @@
     <field name="related_accession_uris" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="related_resource_uris" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="rights_statement_agent_uris" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="has_digital_objects" type="boolean" indexed="true" stored="true" multiValued="false" />
     <field name="event_type" type="string" indexed="true" stored="true" multiValued="false" />
     <field name="outcome" type="string" indexed="true" stored="true" multiValued="false" />
     <field name="parent_title" type="text_general" indexed="true" stored="true" multiValued="false" />

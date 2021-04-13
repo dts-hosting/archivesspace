@@ -108,6 +108,12 @@
         "required" => false
       },
 
+      "has_published_digital_objects" => {
+        "type" => "boolean",
+        "default" => false,
+        "readonly" => true,
+      },
+
       "accession_links" => {
         "type" => "array",
         "items" => {

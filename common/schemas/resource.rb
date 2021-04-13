@@ -134,6 +134,13 @@
         "required" => false
       },
       "metadata_rights_declarations" => {"type" => "array", "items" => {"type" => "JSONModel(:metadata_rights_declaration) object"}},
+
+      "has_published_digital_objects" => {
+        "type" => "boolean",
+        "default" => false,
+        "readonly" => true,
+      },
+
     },
   },
 }

@@ -723,6 +723,8 @@ class IndexerCommon
                                         collect{|instance| instance["digital_object"]}.compact.
                                         collect{|digital_object_instance| digital_object_instance["ref"]}.
                                         flatten.uniq
+
+        doc['has_digital_objects'] = !doc['digital_object_uris'].empty?
       end
     }
 
@@ -974,6 +976,12 @@ class IndexerCommon
           end
         }
         doc['langcode'].uniq!
+      end
+    }
+
+    add_document_prepare_hook {|doc, record|
+      if record['record']['has_published_digital_objects']
+        doc['has_published_digital_objects'] = true
       end
     }
 

@@ -46,6 +46,7 @@ en:
     print-generating: Generating
     collection_overview: Collection Overview
     hierarch: Collection Organization
+    digital_materials: Digital Materials
     numeric: Container Inventory
     clipboard: Copy to clipboard
     cilpboard_cite_item: Copy item citation to clipboard
@@ -146,6 +147,7 @@ en:
       identifier: Identifier
       source: Source
       published_agents: Names
+      has_published_digital_objects: Digital Materials
       agents_text: Names
       classification_uri: Classification
       linked_agent_roles: Role

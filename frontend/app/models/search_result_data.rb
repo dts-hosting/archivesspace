@@ -137,6 +137,7 @@ class SearchResultData
     return I18n.t("enumerations.event_event_type.#{facet.to_s}", :default => facet) if facet_group === "event_type"
     return I18n.t("enumerations.event_outcome.#{facet.to_s}", :default => facet) if facet_group === "outcome"
     return I18n.t("enumerations.subject_term_type.#{facet.to_s}", :default => facet) if facet_group === "first_term_type"
+    return I18n.t("boolean.#{facet.to_s}", :default => facet) if facet_group === "has_digital_objects"
 
     return I18n.t("enumerations.language_iso639_2.#{facet}", :default => facet) if facet_group === "langcode"
 
@@ -313,7 +314,7 @@ class SearchResultData
   end
 
   def self.BASE_FACETS
-    ["primary_type", "creators", "subjects", "langcode"] + Plugins.search_facets_for_base
+    ["primary_type", "creators", "subjects", "langcode", "has_digital_objects"] + Plugins.search_facets_for_base
   end
 
   def self.AGENT_FACETS
@@ -323,11 +324,11 @@ class SearchResultData
   end
 
   def self.ACCESSION_FACETS
-    ["subjects", "accession_date_year", "creators"] + Plugins.search_facets_for_type(:accession)
+    ["subjects", "accession_date_year", "creators", "has_digital_objects"] + Plugins.search_facets_for_type(:accession)
   end
 
   def self.RESOURCE_FACETS
-    ["subjects", "publish", "level", "classification_path", "primary_type", "langcode"] + Plugins.search_facets_for_type(:resource)
+    ["subjects", "publish", "level", "classification_path", "primary_type", "langcode", "has_digital_objects"] + Plugins.search_facets_for_type(:resource)
   end
 
   def self.ARCHIVAL_OBJECT_FACETS

@@ -31,6 +31,7 @@ class Resource < Sequel::Model(:resource)
   include RepresentativeFileVersion
   include Assessments::LinkedRecord
   include Arks
+  include HasDigitalObjects
 
   enable_suppression
 
