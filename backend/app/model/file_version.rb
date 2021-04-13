@@ -42,6 +42,13 @@ class FileVersion < Sequel::Model(:file_version)
       raise Sequel::ValidationFailed.new("File version must be published to be representative.")
     end
 
+    # is_display_thumbnail added by plugin `yale_staff_customizations`
+    if self[:is_display_thumbnail] == true || self[:is_display_thumbnail] == 1
+      validates_unique([:is_display_thumbnail, :digital_object_id],
+                       :message => "A digital object can only have one display thumbnail file version")
+      map_validation_to_json_property([:is_display_thumbnail, :digital_object_id], :is_display_thumbnail)
+    end
+
     super
   end
 

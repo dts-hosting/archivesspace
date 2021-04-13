@@ -48,6 +48,19 @@
 
         $link.html(rootNode.parsed_title);
 
+        if (rootNode.containers) {
+            var hasDigitalObject = false;
+            for (var i=0; i<rootNode.containers.length; i++) {
+                if (rootNode.containers[i].instance_type === 'digital_object') {
+                    hasDigitalObject = true;
+                }
+            }
+
+            if (hasDigitalObject) {
+                $link.append(' <i class="fa fa-th" title="Record has digital objects"></i>');
+            }
+        }
+
         if (rootNode.jsonmodel_type == 'classification') {
             $link.prepend(rootNode.identifier + '<%= I18n.t('classification.identifier_separator') %> ');
         } else if (rootNode.jsonmodel_type == 'resource' && <%= AppConfig[:pui_display_identifiers_in_resource_tree] %> && rootNode.identifier) {
@@ -67,6 +80,19 @@
             $link.html(title);
             if (node.jsonmodel_type == 'archival_object' && <%= AppConfig[:pui_display_identifiers_in_resource_tree] %> && node.identifier) {
                 $link.prepend(node.identifier + '<%= I18n.t('resource.identifier_separator') %> ');
+            }
+
+            if (node.containers) {
+                var hasDigitalObject = false;
+                for (var i=0; i<node.containers.length; i++) {
+                    if (node.containers[i].instance_type === 'digital_object') {
+                        hasDigitalObject = true;
+                    }
+                }
+
+                if (hasDigitalObject) {
+                    $link.append(' <i class="fa fa-th" title="Has digital objects"></i>');
+                }
             }
         }
 

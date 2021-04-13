@@ -39,9 +39,13 @@
 
   <div class="information" style="overflow: hidden;">
       <h3 id="<%= labelledby %>">
-        <a class="record-title" href="<%= app_prefix(@result.uri) %>">  <%== @result.display_string %></a>
+        <a class="record-title" href="<%= app_prefix(@result.uri) %>">
+          <%== @result.display_string %>
+        </a>
       </h3>
   </div>
+
+  <%= render partial: 'shared/thumbnail', locals: {result: @result, :show_spacer => false, :thumbnail_link => app_prefix(@result.uri)} %>
 
   <div class="record-type-badge">
     <%= @result.container_summary_for_badge %>

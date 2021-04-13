@@ -765,3 +765,18 @@ AppConfig[:pui_scroll_view_notes_order] = ['scopecontent',
                                            'arrangement',
                                            'originalsloc',
                                            'relatedmaterial']
+
+# A File Version is considered a thumbnail candidate if its file_format_names matches one of the following values
+AppConfig[:thumbnail_file_format_names] = ['jpeg', 'gif']
+
+# IIIF
+## To enable IIIF set the default viewer URL (also add exceptions by repo_code)
+## For example:
+## AppConfig[:iiif_viewer_url] = {
+#   :default => 'http://iiif-viewer.com?manifest=',
+#   'myrepo' => 'http://myrepo-iiif-viewer.com?manifest=',
+## }
+# IIIF File Version criteria
+AppConfig['iiif_file_format_name'] = 'iiif'
+AppConfig['iiif_use_statement'] = 'text-json'
+AppConfig['iiif_xlink_show_attribute'] = 'embed'

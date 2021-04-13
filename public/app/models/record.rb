@@ -90,6 +90,95 @@ class Record
     return process_mixed_content(json['display_string'] || json['title'], :preserve_newlines => true)
   end
 
+  def digital_objects?
+    Array(json['instances']).any?{|instance| instance['digital_object'] && instance.dig('digital_object', '_resolved', 'publish')}
+  end
+
+  def thumbnail_embed
+    return @thumbnail_embed if @thumbnail_embed
+
+    file_version_candidates = fetch_candidate_file_versions
+
+    result = file_version_candidates.detect{|fv| fv['is_display_thumbnail']}
+    result ||= file_version_candidates.detect{|fv| fv['use_statement'] == 'image-thumbnail'}
+
+    @thumbnail_embed = result
+  end
+
+  def thumbnail_link
+    return @thumbnail_link if @thumbnail_link
+
+    file_version_candidates = fetch_candidate_file_versions
+
+    result = file_version_candidates.detect{|fv| fv['is_representative']}
+    result ||= file_version_candidates.detect{|fv| fv['use_statement'] != 'image-thumbnail' && fv['use_statement'] != 'embed'}
+    result ||= file_version_candidates.first
+
+    @thumbnail_link = result
+  end
+
+  def thumbnail_caption
+    file_version_candidates = fetch_candidate_file_versions
+
+    return display_string if file_version_candidates.empty?
+
+
+    # 1. take the embedded thumbnail caption or digital object title
+    if (embed = thumbnail_embed)
+      if embed['caption']
+        return embed['caption']
+      elsif (digital_object_title = embed.dig('_digital_object', 'title'))
+        return digital_object_title
+      end
+    end
+
+    # 2. take the representative caption
+    if (representative = file_version_candidates.detect{|fv| fv['is_representative']})
+      if representative['caption']
+        return representative['caption']
+      elsif (digital_object_title = representative.dig('_digital_object', 'title'))
+        return digital_object_title
+      end
+    end
+
+    # 3. ok.. take the first digital object's title
+    file_version_candidates.each do |fv|
+      if (digital_object_title = fv.dig('_digital_object', 'title'))
+        return digital_object_title
+      end
+    end
+
+    # 4. if all fails then take the current record's title
+    display_string
+  end
+
+  def iiif_manifest
+    return @iiif_embed if @iiif_embed
+
+    file_version_candidates = fetch_candidate_file_versions
+
+    @iiif_embed = file_version_candidates.detect do |fv|
+      fv['file_format_name'] == AppConfig[:iiif_file_format_name] &&
+        fv['use_statement'] == AppConfig[:iiif_use_statement] &&
+        fv['xlink_show_attribute'] == AppConfig[:iiif_xlink_show_attribute]
+    end
+  end
+
+  def iiif_viewer_url
+    repo_code = resolved_repository.fetch('repo_code')
+    AppConfig[:iiif_viewer_url].fetch(repo_code, AppConfig[:iiif_viewer_url].fetch(:default))
+  end
+
+  def iiif_enabled?
+    AppConfig.has_key?(:iiif_viewer_url) &&
+      AppConfig[:iiif_viewer_url].is_a?(Hash) &&
+      AppConfig[:iiif_viewer_url].has_key?(:default)
+  end
+
+  def show_thumbnail?
+    fetch_candidate_file_versions.any?
+  end
+
   private
 
   def parse_identifier
@@ -490,4 +579,30 @@ class Record
     container_info
   end
 
+  def fetch_candidate_file_versions
+    return @file_version_candidates if @file_version_candidates
+
+    file_version_candidates = []
+
+    if ['resource', 'archival_object', 'accession'].include?(@primary_type)
+      Array(json['instances']).each do |instance|
+        if (digital_object = instance.dig('digital_object', '_resolved'))
+          # skip unpublished digital objects
+          next unless digital_object['publish']
+
+          if instance['is_representative']
+            file_version_candidates = Array(digital_object['file_versions']).map{|fv| fv['_digital_object'] = digital_object; fv}
+            break
+          else
+            file_version_candidates += Array(digital_object['file_versions']).map{|fv| fv['_digital_object'] = digital_object; fv}
+          end
+        end
+      end
+    else
+      file_version_candidates = Array(json['file_versions'])
+    end
+
+    # drop unpublished file versions and cache
+    @file_version_candidates = file_version_candidates.reject{|fv| !fv['publish'] }
+  end
 end
