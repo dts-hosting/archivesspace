@@ -19,11 +19,13 @@
 <%= render partial: 'resources/resource_alltabs' %>
 
 <div class="row" id="notes_row">
-  <div class="col-sm-9">
+  <%# mdc: changing the BS layout from 9,3 to 8,4. %>
+  <div class="col-sm-8">
     <%= render partial: 'shared/digital', locals: {:rep_fv => @rep_fv, :dig_objs => @dig} %>
     <%= render partial: 'shared/record_innards' %>
+    <%= render partial: 'shared/report_problem' %>
   </div>
-  <div id="sidebar" class="col-sm-3 sidebar sidebar-container resizable-sidebar" <% unless @has_children %>style="display: none"<% end %>>
+  <div id="sidebar" class="col-sm-4 sidebar sidebar-container resizable-sidebar" <% unless @has_children %>style="display: none"<% end %>>
     <% if defined?(@filters) && defined?(@search) %>
     <%= render partial: 'shared/facets' %>
    <% end %>

@@ -12,16 +12,18 @@
    <%= render partial: 'shared/breadcrumbs' %>
 
   <div class="row" id="notes_row">
-   <div class="col-sm-9">
+    <%# mdc: changing 9, 3 to 8,4 for layout %>
+   <div class="col-sm-8">
     <% if  defined?(comp_id) && !comp_id && !@result['json']['ref_id'].blank? %>
       <span class='ref_id'>[<%=  t('archival_object._public.header.ref_id') %>: <%= @result['json']['ref_id'] %>]</span>
     <% end %>
     <%= render partial: 'shared/digital', locals: {:rep_fv => @rep_fv, :dig_objs => @dig} %>
     <%= render partial: 'shared/record_innards' %>
+    <%= render partial: 'shared/report_problem' %>
    </div>
 
    <% if !@result.instance_of?(DigitalObject) || @has_children %>
-    <div id="sidebar" class="sidebar sidebar-container col-sm-3 resizable-sidebar">
+    <div id="sidebar" class="sidebar sidebar-container col-sm-4 resizable-sidebar">
       <%
         if @result.kind_of?(DigitalObject)
           heading_text = t('dig_cont_arr')

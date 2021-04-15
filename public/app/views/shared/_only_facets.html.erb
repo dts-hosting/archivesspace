@@ -1,5 +1,5 @@
 <% unless @facets.blank? %>
-<h3><%= t('search_results.filter.add')%>: </h3>
+<h2><%= t('search_results.filter.add')%> </h2>
 <dl id="facets">
 
   <%
@@ -31,14 +31,14 @@
       <dd>
         <a href="<%= app_prefix("#{@page_search}&filter_fields[]=#{type}&filter_values[]=#{CGI.escape(facet.key)}") %>"
            rel="nofollow"
-           title="<%= t('search_results.filter_by')%> '<%= facet.label %>'">
-          <%= facet.label %>
+           title="<%= t('search_results.filter_by')%> '<%= facet.label.gsub(/\$\w:\s/, '') %>'">
+          <%= facet.label.gsub(/\$\w:\s/, '') %>
         </a>
         <span class="recordnumber"><%= facet.count %></span>
       </dd>
     <% end %>
     <% if facet_group.size > 5 %>
-+        <span class="less btn">&and; <%= t('search_results.fewer_facets') %></span>
+         <span class="less btn">&and; <%= t('search_results.fewer_facets') %></span>
       </div>
     <% end %>
     <span class="type-spacer">&nbsp;</span>

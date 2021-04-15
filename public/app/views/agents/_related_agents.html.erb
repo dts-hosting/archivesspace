@@ -11,7 +11,8 @@
     <% relationships.each do |relationship| %>
       <% agent = relationship['_resolved'] %>
       <li>
-        <%= link_to agent['display_name']['sort_name'], app_prefix(agent['uri']) %>
+        <%# added the gsub part to deal with name/title agents.  remove if we ever find a proper fix for those headings. %>
+        <%= link_to agent['display_name']['sort_name'].gsub(/\$\w:\s/, ''), app_prefix(agent['uri']) %>
         <% if relationship['specific_relator'] %>
           (<%= I18n.t("enumerations.specific_relator.#{relationship['specific_relator']}", :default => relationship['specific_relator']) %>)
         <% else %>
