@@ -122,6 +122,21 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
+  Endpoint.get_or_post('/search/subjects')
+    .description("Search across subjects")
+    .params(*BASE_SEARCH_PARAMS)
+    .permissions([])
+    .paginated(true)
+    .returns([200, ""]) \
+  do
+    if params[:dt] && params[:dt] == "csv"
+      stream_response(Search.search_csv(params.merge(:type => ['subject']), nil), "text/csv")
+    else
+      json_response(Search.search(params.merge(:type => ['subject']), nil))
+    end
+  end
+
+
   Endpoint.get('/search/published_tree')
   .description("Find the tree view for a particular archival record")
   .params(["node_uri", String, "The URI of the archival record to find the tree view for"])
