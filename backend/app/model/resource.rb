@@ -32,6 +32,7 @@ class Resource < Sequel::Model(:resource)
   include Assessments::LinkedRecord
   include Arks
   include HasDigitalObjects
+  include RestrictionCalculator
 
   enable_suppression
 

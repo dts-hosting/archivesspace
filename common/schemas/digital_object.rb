@@ -80,6 +80,17 @@
         },
       },
       "metadata_rights_declarations" => {"type" => "array", "items" => {"type" => "JSONModel(:metadata_rights_declaration) object"}},
+
+      "restricted" => {
+        "type" => "boolean",
+        "readonly" => "true"
+      },
+
+      "active_restrictions" => {
+        "type" => "array",
+        "readonly" => "true",
+        "items" => {"type" => "JSONModel(:rights_restriction) object"},
+      },
     },
   },
 }

@@ -24,6 +24,7 @@ class DigitalObject < Sequel::Model(:digital_object)
   include Publishable
   include Assessments::LinkedRecord
   include RepresentativeFileVersion
+  include RestrictionCalculator
 
   enable_suppression
 
