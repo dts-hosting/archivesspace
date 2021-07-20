@@ -179,6 +179,15 @@ class Record
     fetch_candidate_file_versions.any?
   end
 
+  def build_instance_display_string(instance)
+    if sc = instance.fetch('sub_container', nil)
+      parse_sub_container_display_string(sc, instance)
+    else
+      raise "FIXME Digital Object not supported"
+    end
+  end
+
+
   private
 
   def parse_identifier
