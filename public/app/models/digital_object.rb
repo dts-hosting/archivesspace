@@ -32,6 +32,12 @@ class DigitalObject < Record
     ]
   end
 
+  def resource_uri
+    return resolved_resource['uri'] if resolved_resource
+
+    json.dig('resource','ref')
+  end
+
   private
 
   def parse_identifier

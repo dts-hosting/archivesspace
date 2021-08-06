@@ -8,6 +8,12 @@
   describedby = "infinite-item-notes-#{record_number}"
 
   has_visible_notes = scroll_view_notes_order.any?{|note_type| (note = @result.note(note_type)) && !note['note_text'].blank?}
+
+  requestable = false
+  if defined? AeonRecordMapper
+    mapper = AeonRecordMapper.mapper_for(@result)
+    requestable = !mapper.hide_button? && mapper.show_action?
+  end
 %>
 <div class="infinite-item infinite-item-indent-<%= indent_level %> infinite-item-<%= @result.primary_type.gsub('_','-') %>"
      role="article"
@@ -19,6 +25,7 @@
      data-collectionsize="<%= collection_size %>"
      tabindex="0"
      data-uri="<%= @result.uri %>"
+     <% if requestable %>data-requestable="<%= requestable %>"<% end %>
 >
 
   <nav class="context" style="display: none" aria-hidden="true">

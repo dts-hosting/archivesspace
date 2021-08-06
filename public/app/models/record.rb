@@ -183,7 +183,7 @@ class Record
     if sc = instance.fetch('sub_container', nil)
       parse_sub_container_display_string(sc, instance)
     elsif digital_object = instance.dig('digital_object', '_resolved')
-      digital_object['display_string']
+      digital_object.fetch('title')
     else
       raise "Instance not supported: #{instance}"
     end
