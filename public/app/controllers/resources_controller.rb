@@ -209,15 +209,15 @@ class ResourcesController < ApplicationController
 
   def waypoints
     search_opts = {
-      'resolve[]' => ['top_container_uri_u_sstr:id']
+      'resolve[]' => ['top_container_uri_u_sstr:id'],
     }
 
-    urls = params[:urls]
+    waypoint_uris = params[:urls].map{|uri| "#{uri}#pui"}
     waypoint_size = params[:size].to_i
     waypoint_number = params[:number].to_i
     collection_size = params[:collection_size].to_i
 
-    results = archivesspace.search_records(params[:urls], search_opts, true)
+    results = archivesspace.search_records(waypoint_uris, search_opts, true)
 
     # setup caching
     resource_uri = "/repositories/#{params[:rid]}/resources/#{params[:id]}"
@@ -233,7 +233,7 @@ class ResourcesController < ApplicationController
       format.json do
         render :json => Hash[results.records.map {|record|
           @result = record
-          record_number = (waypoint_number * waypoint_size) + urls.index(@result.uri) + 1
+          record_number = (waypoint_number * waypoint_size) + waypoint_uris.index(@result.uri) + 1
           [record.uri,
            render_to_string(:partial => 'infinite_item',
                             :locals => {
