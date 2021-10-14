@@ -212,12 +212,13 @@ class ResourcesController < ApplicationController
       'resolve[]' => ['top_container_uri_u_sstr:id'],
     }
 
-    waypoint_uris = params[:urls].map{|uri| "#{uri}#pui"}
+    waypoint_uris = params[:urls]
+    waypoint_record_ids = waypoint_uris.map{|uri| "#{uri}#pui"}
     waypoint_size = params[:size].to_i
     waypoint_number = params[:number].to_i
     collection_size = params[:collection_size].to_i
 
-    results = archivesspace.search_records(waypoint_uris, search_opts, true)
+    results = archivesspace.search_records(waypoint_record_ids, search_opts, true)
 
     # setup caching
     resource_uri = "/repositories/#{params[:rid]}/resources/#{params[:id]}"
