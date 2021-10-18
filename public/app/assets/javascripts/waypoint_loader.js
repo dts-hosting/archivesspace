@@ -143,13 +143,16 @@
         var self = this;
 
         var waypointSize = $('.waypoint').first().data('waypoint-size');
-        var targetWaypoint = Math.floor(recordNumber / waypointSize);
+        var targetWaypoint = Math.floor((recordNumber - 1) / waypointSize);
 
         var scrollTo = function (recordNumber) {
             $('#record-number-' + recordNumber + ' > .infinite-item').focus();
         };
 
-        if (!$($('.waypoint')[targetWaypoint]).is('.populated')) {
+        if (recordNumber === 0) {
+            // the resource!
+            scrollTo(recordNumber);
+        } else if (!$($('.waypoint')[targetWaypoint]).is('.populated')) {
             console.warn("Cannot scrollToRecord as waypoint not populated")
         } else if ($($('.waypoint')[targetWaypoint]).is('.loading')) {
             $($('.waypoint')[targetWaypoint]).focus();
