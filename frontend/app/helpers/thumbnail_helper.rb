@@ -138,6 +138,10 @@ module ThumbnailHelper
 
     add_column(
       "Thumbnail",
+      {
+        :sortable => false,
+        :class => 'thumbnail-col'
+      },
       proc {|record|
         json = ASUtils.json_parse(record['json'])
         if thumbnail_available?(json)
@@ -148,7 +152,6 @@ module ThumbnailHelper
           })
         end
       },
-      :sortable => false, :class => 'thumbnail-col'
     )
   end
 
