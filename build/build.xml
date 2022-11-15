@@ -40,7 +40,7 @@
   -->
   <property name="env.JAVA_OPTS" value="" />
   <!-- Setup defaults for MySQL and Solr dev / test environment -->
-  <property name="env.APPCONFIG_DB_URL" value="${aspace.db_url.dev}" />
+
   <property name="env.APPCONFIG_SOLR_URL" value="${aspace.solr_url.dev}" />
   <property name="env.ASPACE_TEST_DB_URL" value="${aspace.db_url.test}" />
   <property name="env.ASPACE_TEST_SOLR_URL" value="${aspace.solr_url.test}" />
@@ -91,7 +91,7 @@
         <env key="ASPACE_ENV" value="development" />
         <env key="ASPACE_INTEGRATION" value="${aspace.integration}" />
         <env key="APPCONFIG_DATA_DIRECTORY" value="${aspace.data_directory.dev}" />
-        <env key="APPCONFIG_DB_URL" value="${env.APPCONFIG_DB_URL}" />
+
         <env key="APPCONFIG_SOLR_URL" value="${env.APPCONFIG_SOLR_URL}" />
         <arg line="app/main.rb ${aspace.backend.port}" />
       </java>
@@ -497,7 +497,7 @@
       <env key="GEM_HOME" value="${gem_home}" />
       <env key="GEM_PATH" value="" />
       <env key="BUNDLE_PATH" value="${gem_home}" />
-      <env key="APPCONFIG_DB_URL" value="${env.APPCONFIG_DB_URL}" />
+
       <arg line="-Iapp/lib ../build/scripts/migrate_db.rb" />
     </java>
   </target>
@@ -520,7 +520,7 @@
       <env key="GEM_HOME" value="${gem_home}" />
       <env key="GEM_PATH" value="" />
       <env key="BUNDLE_PATH" value="${gem_home}" />
-      <env key="APPCONFIG_DB_URL" value="${env.APPCONFIG_DB_URL}" />
+
       <arg line="-Iapp/lib ../build/scripts/migrate_db.rb nuke" />
     </java>
   </target>
@@ -582,7 +582,7 @@
       <env key="GEM_PATH" value="" />
       <env key="BUNDLE_PATH" value="${gem_home}" />
       <env key="APPCONFIG_DATA_DIRECTORY" value="${aspace.data_directory.dev}" />
-      <env key="APPCONFIG_DB_URL" value="${env.APPCONFIG_DB_URL}" />
+
       <env key="APPCONFIG_SOLR_URL" value="${env.APPCONFIG_SOLR_URL}" />
       <env key="ASPACE_ENV" value="development" />
       <arg line="app/main.rb" />
@@ -666,7 +666,7 @@
       <env key="ASPACE_ENV" value="development" />
       <env key="ASPACE_INTEGRATION" value="${aspace.integration}" />
       <env key="APPCONFIG_DATA_DIRECTORY" value="${aspace.data_directory.dev}" />
-      <env key="APPCONFIG_DB_URL" value="${env.APPCONFIG_DB_URL}" />
+
       <env key="APPCONFIG_FRONTEND_PROXY_URL" value="http://localhost:3000" />
       <env key="APPCONFIG_PUBLIC_PROXY_URL" value="http://localhost:3001" />
       <env key="APPCONFIG_SOLR_URL" value="${env.APPCONFIG_SOLR_URL}" />
@@ -782,7 +782,7 @@
       <env key="ASPACE_ENV" value="development" />
       <env key="ASPACE_INTEGRATION" value="${aspace.integration}" />
       <env key="APPCONFIG_DATA_DIRECTORY" value="${aspace.data_directory.dev}" />
-      <env key="APPCONFIG_DB_URL" value="${env.APPCONFIG_DB_URL}" />
+
       <env key="APPCONFIG_FRONTEND_PROXY_URL" value="http://localhost:3000" />
       <env key="APPCONFIG_PUBLIC_PROXY_URL" value="http://localhost:3001" />
       <env key="APPCONFIG_SOLR_URL" value="${env.APPCONFIG_SOLR_URL}" />

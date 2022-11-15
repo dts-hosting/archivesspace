@@ -136,11 +136,12 @@ module ASModel
 
 
           # And another that will return records from any repository
-          def_dataset_method(:any_repo) do
+          def_dataset_method(:any_repo) do |dataset=false|
+            my_ds = dataset || orig_ds
             if model.suppressible? && model.enforce_suppression?
-              orig_ds.filter(Sequel.qualify(model.table_name, :suppressed) => 0)
+              my_ds.filter(Sequel.qualify(model.table_name, :suppressed) => 0)
             else
-              orig_ds
+              my_ds
             end
           end
 
