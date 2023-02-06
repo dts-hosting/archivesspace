@@ -7,6 +7,18 @@ class FileVersion < Sequel::Model(:file_version)
 
   corresponds_to JSONModel(:file_version)
 
+  def before_validation
+    super
+
+    # Yale stuff
+    #
+    # Uniq constraint for only 1xdisplay thumbnail per DO
+    # only works if non-thumbnail file versions have a null
+    # is_display_thumbnail column value. See is_representative
+    # for similar stupid.
+    self.is_display_thumbnail = nil if self.is_display_thumbnail != 1
+  end
+
   def representative_for_types
     { is_representative: [:digital_object] }
   end
