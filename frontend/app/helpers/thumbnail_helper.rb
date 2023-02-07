@@ -140,7 +140,8 @@ module ThumbnailHelper
       "Thumbnail",
       {
         :sortable => false,
-        :class => 'thumbnail-col'
+        :class => 'thumbnail-col',
+        :index => 0,
       },
       proc {|record|
         json = ASUtils.json_parse(record['json'])
