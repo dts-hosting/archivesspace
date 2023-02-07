@@ -72,7 +72,7 @@ class ArchivesSpaceClient
     results = do_search(url)
 
     # Ensure that the order of our results matches the order of `record_list`
-    results['results'] = results['results'].sort_by {|result| record_list.index(result.fetch('uri'))}
+    results['results'] = results['results'].sort_by {|result| record_list.index(result.fetch('id'))}
 
     SolrResults.new(results, search_opts, full_notes)
   end
