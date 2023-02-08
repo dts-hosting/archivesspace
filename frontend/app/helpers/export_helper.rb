@@ -8,16 +8,12 @@ module ExportHelper
         # Preserve filters
         filters = AdvancedQueryBuilder.new
 
-        # The staff interface shouldn't show records that were only created for the
-        # Public User Interface.
-        filters.and('types', 'pui_only', 'text', literal = true, negated = true)
-
         Array(params['filter_term[]']).each do |json_filter|
           filter = ASUtils.json_parse(json_filter)
           filters.and(filter.keys[0], filter.values[0])
         end
 
-        params['filter'] = filters.build.to_json
+        params['filter'] = filters.build.to_json unless filters.empty?
 
     params["dt"] = "csv"
 

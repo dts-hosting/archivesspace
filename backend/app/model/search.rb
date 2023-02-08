@@ -181,6 +181,9 @@ class Search
   def self.search_csv_beta(params, repo_id)
     csv_clz = Kernel.const_get(AppConfig[:search_csv_class].intern)
 
+    # Beta search only requires the SOLR record `json` field.
+    params.merge!(:fields => ['json'])
+
     Enumerator.new do |y|
       csv = csv_clz.new
 
