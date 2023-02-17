@@ -37,8 +37,6 @@ class LargeTreeResource
   end
 
   def waypoint(response, record_ids, opts = {})
-    published_only = opts.fetch(:published_only, false)
-
     # Load the instance type and record level
     ArchivalObject
       .left_join(Sequel.as(:enumeration_value, :level_enum), :id => :archival_object__level_id)
@@ -132,14 +130,14 @@ class LargeTreeResource
                       Sequel.as(:sub_container__indicator_3, :indicator_3))
 
     if @published_only
-      query
-        .left_join(:instance_do_link_rlshp, :instance_do_link_rlshp__instance_id => :instance_id)
-        .left_join(:digital_object, :digital_object_id => :instance_do_link_rlshp__digital_object_id)
-        .filter(Sequel.|({:instance__publish => 1},
-                         Sequel.&(Sequel.~(:digital_object__id => nil),
-                                  Sequel.|({:instance_do_link_rlshp__suppressed => 0},
-                                           {:digital_object__publish => 1},
-                                           {:digital_object__suppressed => 0}))))
+      query = query
+        .left_join(:instance_do_link_rlshp, :instance_do_link_rlshp__instance_id => :instance__id)
+        .left_join(:digital_object, :id => :instance_do_link_rlshp__digital_object_id)
+        .filter(Sequel.|(Sequel.~(:instance_type__value => 'digital_object'),
+                         Sequel.&({:instance_type__value => 'digital_object'},
+                                  {:instance_do_link_rlshp__suppressed => 0},
+                                  {:digital_object__publish => 1},
+                                  {:digital_object__suppressed => 0})))
     end
 
     query
