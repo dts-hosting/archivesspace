@@ -328,6 +328,16 @@ class ResourcesController < ApplicationController
     @context = [{:uri => @repo_info['top']['uri'], :crumb => @repo_info['top']['name']}, {:uri => nil, :crumb => process_mixed_content(@result.display_string)}]
     fill_request_info
 
+    @sort = params['sort'] || 'ao_tree_position_u_ssort asc'
+    @criteria['sort'] = @sort
+    if @criteria['sort'] != 'ao_tree_position_u_ssort asc'
+      @criteria['sort'] += ', ao_tree_position_u_ssort asc'
+    end
+
+    all_sort_opts = Search.get_sort_opts
+    all_sort_opts.delete('relevance')
+    @sort_opts = [['"Collection Order"', 'ao_tree_position_u_ssort asc']] + all_sort_opts.values
+
     fetch_digital_materials(uri, "#{uri}/digital_materials", params)
 
     if !@results.blank?
@@ -377,7 +387,7 @@ class ResourcesController < ApplicationController
     qry = "resource:\"#{resource_uri}\" AND has_published_digital_objects:true"
     @base_search = "#{page_uri}?"
 
-    set_up_search(['pui'], ObjectsController::DEFAULT_OBJ_FACET_TYPES, {}, params, qry)
+    set_up_search(['pui'], ObjectsController::DEFAULT_OBJ_FACET_TYPES, @criteria, params, qry)
     @base_search= @base_search.sub("q=#{qry}", '')
     page = Integer(params.fetch(:page, "1"))
 

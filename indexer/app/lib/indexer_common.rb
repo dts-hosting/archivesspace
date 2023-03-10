@@ -408,6 +408,7 @@ class IndexerCommon
         doc['ref_id'] = record['record']['ref_id']
         doc['slug'] = record['record']['slug']
         doc['is_slug_auto'] = record['record']['is_slug_auto']
+        doc['ao_tree_position_u_ssort'] = record['record']['tree_position']
       end
     }
 

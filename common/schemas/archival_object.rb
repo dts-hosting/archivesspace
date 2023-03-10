@@ -142,6 +142,8 @@
         "readonly" => "true",
         "items" => {"type" => "JSONModel(:rights_restriction) object"},
       },
+
+      "tree_position" => {"type" => "string", "readonly" => "true"},
     },
   },
 }

@@ -45,7 +45,7 @@ class Search < Struct.new(:q, :op, :field, :limit, :from_year, :to_year, :filter
         self[f.to_sym] = params.fetch(f.to_sym, '')
       end
     end
-    self[:q].each_with_index do |q, i|
+    ASUtils.wrap(self[:q]).each_with_index do |q, i|
       self[:q][i] = '*' if q.blank?
     end
     self[:sort] = params.fetch('sort', nil)
