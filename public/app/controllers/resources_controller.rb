@@ -336,7 +336,7 @@ class ResourcesController < ApplicationController
 
     all_sort_opts = Search.get_sort_opts
     all_sort_opts.delete('relevance')
-    @sort_opts = [['"Collection Order"', 'ao_tree_position_u_ssort asc']] + all_sort_opts.values
+    @sort_opts = [['Collection Order', 'ao_tree_position_u_ssort asc']] + all_sort_opts.values
 
     fetch_digital_materials(uri, "#{uri}/digital_materials", params)
 
