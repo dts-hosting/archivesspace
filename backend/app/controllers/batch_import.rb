@@ -10,7 +10,7 @@ class ArchivesSpaceService < Sinatra::Base
             ["migration", String, "Param to indicate we are using a migrator", :optional => true ],
             ["skip_results", BooleanParam, "If true, don't return the list of created record URIs",
              :optional => true ])
-    .request_context(:create_enums => true)
+    .request_context(:create_enums => AppConfig[:import_create_missing_enums])
     .use_transaction(false)
     .permissions([:import_records])
     .returns([200, :created],

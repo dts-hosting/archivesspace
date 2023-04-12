@@ -786,3 +786,6 @@ AppConfig[:search_csv_class] = 'SearchCSVStream'
 AppConfig[:search_csv_extra_nested_records] = []
 AppConfig[:search_csv_extra_excluded_properties] = []
 AppConfig[:search_csv_max_nested_records] = 10
+
+# Allow creating missing enums in batch imports to configurable
+AppConfig[:import_create_missing_enums] = true
