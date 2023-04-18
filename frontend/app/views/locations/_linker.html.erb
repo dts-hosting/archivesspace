@@ -30,7 +30,7 @@
             data-label_plural="<%= I18n.t("location._plural") %>"
             data-name="ref"
             data-path="<%= form.path %>"
-            data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json %>"
+            data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json, :sort => "score desc" %>"
             data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => SearchResultData.LOCATION_FACETS %>"
             data-selected="<%= selected_json %>"
             data-multiplicity="one"

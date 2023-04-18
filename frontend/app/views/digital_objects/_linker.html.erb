@@ -27,7 +27,7 @@
              data-label_plural="<%= I18n.t("digital_object._plural") %>"
              data-path="<%= form.path %>"
              data-name="ref"
-             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json %>"
+             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json, :sort => "score desc" %>"
              data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => SearchResultData.DIGITAL_OBJECT_FACETS %>"
              data-selected="<%= selected_json %>"
              data-format_property="title"

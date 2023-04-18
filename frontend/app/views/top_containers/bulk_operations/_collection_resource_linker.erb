@@ -15,7 +15,7 @@
          data-label_plural="<%= I18n.t("top_container._frontend.bulk_operations.collection_resource_plural") %>"
          data-name="ref"
          data-path="collection_resource"
-         data-url="<%= url_for  :controller => :search, :action => :do_search, :format => :json %>"
+         data-url="<%= url_for  :controller => :search, :action => :do_search, :format => :json, :sort => "score desc,title_sort asc" %>"
          data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => [], :sort => "title_sort asc" %>"
          data-selected="<%= selected_json %>"
          data-multiplicity="one"

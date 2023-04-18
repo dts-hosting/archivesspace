@@ -25,7 +25,7 @@
              data-label_plural="<%= I18n.t("linked_record.ref_plural") %>"
              data-name="ref"
              data-path="<%= form.path %>"
-             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json %>"
+             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json, :sort => "score desc" %>"
              data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => (SearchResultData.ACCESSION_FACETS+SearchResultData.RESOURCE_FACETS).uniq %>"
              data-selected="<%= selected_json %>"
              data-multiplicity="one"

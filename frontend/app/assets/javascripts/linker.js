@@ -6,6 +6,10 @@ $(function () {
     resource_edit_path_regex
   );
 
+  function decodeURIComponentWithPlusEscapes(s) {
+    return decodeURIComponent(s.replace(/\+/g, '%20'));
+  }
+
   $.fn.linker = function () {
     $(this).each(function () {
       var $this = $(this);
@@ -23,8 +27,8 @@ $(function () {
       $('.prelinker', $linkerWrapper).remove();
 
       var config = {
-        url: decodeURIComponent($this.data('url')),
-        browse_url: decodeURIComponent($this.data('browse-url')),
+        url: decodeURIComponentWithPlusEscapes($this.data('url')),
+        browse_url: decodeURIComponentWithPlusEscapes($this.data('browse-url')),
         span_class: $this.data('span-class'),
         format_template: $this.data('format_template'),
         format_template_id: $this.data('format_template_id'),
