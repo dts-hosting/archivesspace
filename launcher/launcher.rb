@@ -46,6 +46,7 @@ def start_server(port, *webapps)
   contexts = webapps.map do |webapp|
     if webapp[:war]
       context = org.eclipse.jetty.webapp.WebAppContext.new
+      context.set_init_parameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false")
       context.server = server
       context.context_path = webapp[:path]
       context.war = webapp[:war]
