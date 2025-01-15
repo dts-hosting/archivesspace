@@ -756,3 +756,8 @@ AppConfig[:pui_pdf_title_line_height] = "140%"
 # Password recovery - requires email configuration
 # See example email configuration above
 AppConfig[:allow_password_reset] = false
+
+AppConfig[:pui_cache_enabled] = false
+AppConfig[:pui_cache_address] = "localhost:11211"
+AppConfig[:pui_cache_pool_size] = 5
+AppConfig[:pui_cache_url_matchers] = ["http"]
