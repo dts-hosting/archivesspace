@@ -56,7 +56,9 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store
+  config.cache_store = :mem_cache_store, AppConfig[:pui_cache_address], {
+    namespace: "pui", compress: true, pool_size: AppConfig[:pui_cache_pool_size]
+  }
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque

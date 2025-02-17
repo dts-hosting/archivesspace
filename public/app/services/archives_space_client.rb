@@ -148,7 +148,13 @@ class ArchivesSpaceClient
       request = Net::HTTP::Post.new(url)
       Rails.logger.debug("POST Search url: #{url} ")
     end
-    response = do_http_request(request)
+    if cacheable?(url)
+      response = Rails.cache.fetch(cache_key(url), expires_in: 5.minutes) do
+        do_http_request(request)
+      end
+    else
+      response = do_http_request(request)
+    end
     if response.code.to_s != '200'
       raise RequestFailedException.new("#{response.code}: #{response.body}")
     end
@@ -156,6 +162,15 @@ class ArchivesSpaceClient
     results
   end
 
+  def cacheable?(url)
+    return false unless AppConfig[:pui_cache_enabled]
+
+    AppConfig[:pui_cache_url_matchers].any? { |matcher| url.to_s.match(matcher) }
+  end
+
+  def cache_key(url)
+    Digest::SHA256.hexdigest("#{AppConfig[:public_proxy_url]}|#{url}")
+  end
 
   # Authenticate to ArchivesSpace and grab a session token.  If @session isn't
   # nil, this won't do anything.  If multiple threads attempt to log in at the
