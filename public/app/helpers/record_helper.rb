@@ -42,7 +42,7 @@ module RecordHelper
   def record_from_resolved_json(json, full = false)
     record_for_type({
                       'json' => json,
-                      'primary_type' => json.fetch('jsonmodel_type'),
+                      'primary_type' => json.fetch('jsonmodel_type', nil),
                       'uri' => json.fetch('uri')
                     }, full)
   end

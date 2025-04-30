@@ -4,8 +4,13 @@
   will-change: transform;
 
   .waypoint {
-    height: auto;
+    height: 200px;
   }
+
+  .waypoint.populated {
+    height: auto !important;
+  }
+
 }
 
 .infinite-record-scrollbar {
@@ -88,19 +93,4 @@ $indent-width: 20px;
     background: #FAFAFA;
     width: 100%;
     border: 4px;
-}
-
-.waypoint:last-child {
-  .infinite-record-record:last-child {
-    &::after {
-      content: '';
-      border-bottom: 5px solid #ccc;
-      width: 90%;
-      left: 5%;
-      display: block;
-      padding-top: 40px;
-      background: #fff;
-      position: absolute;
-    }
-  }
 }

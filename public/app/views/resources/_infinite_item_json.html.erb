@@ -1,0 +1,8 @@
+<div class="infinite-record-record" id="record-number-<%= record_number %>" data-record-number="<%= record_number %>" data-level="<%= @result.level %>" data-uri="<%= @result['uri'] %>" data-ancestors="<%=h @result.ancestors_with_level.to_json %>">
+  <%= render partial: 'resources/infinite_item',
+             locals: {
+               record_number: record_number,
+               collection_size: collection_size
+             }
+  %>
+</div>

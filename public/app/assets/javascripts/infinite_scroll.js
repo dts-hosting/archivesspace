@@ -1,3 +1,5 @@
+// NOTE: This file is not being used by Yale's collection organization page.  See waypoint_loader.js.
+
 (function (exports) {
   var BATCH_SIZE = 2;
   var SCROLL_DELAY_MS = 50;

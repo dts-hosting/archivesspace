@@ -201,6 +201,7 @@ class ResourcesController < ApplicationController
         {:uri => nil, :crumb => process_mixed_content(@result.display_string), type: @result.primary_type}]
       fill_request_info
       @ordered_records = archivesspace.get_record(@root_uri + '/ordered_records').json.fetch('uris')
+
       @ordered_records.shift # drop resource as rendered by default
     rescue RecordNotFound
       record_not_found(uri, 'resource')
@@ -209,7 +210,7 @@ class ResourcesController < ApplicationController
 
   def waypoints
     search_opts = {
-      'resolve[]' => ['top_container_uri_u_sstr:id'],
+      'resolve[]' => ['top_container_uri_u_sstr:id', 'ancestors:id@compact_resource'],
     }
 
     waypoint_uris = params[:urls]
@@ -234,9 +235,11 @@ class ResourcesController < ApplicationController
       format.json do
         render :json => Hash[results.records.map {|record|
           @result = record
+
           record_number = (waypoint_number * waypoint_size) + waypoint_uris.index(@result.uri) + 1
           [record.uri,
-           render_to_string(:partial => 'infinite_item',
+           render_to_string(:partial => 'infinite_item_json',
+                            :formats => :html,
                             :locals => {
                               :record_number =>  record_number,
                               :collection_size =>  collection_size
