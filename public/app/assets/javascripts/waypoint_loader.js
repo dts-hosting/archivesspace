@@ -1,4 +1,8 @@
 (function(exports) {
+    var BATCH_SIZE = 2;
+    var SCROLL_DELAY_MS = 50;
+    var SCROLL_DRAG_DELAY_MS = 500;
+    var LOAD_THRESHOLD_PX = 5000;
 
     var HASH_PREFIX = 'scroll::';
 
@@ -9,6 +13,8 @@
         this.contextSummaryElt = elt.siblings('.infinite-record-context');
         this.container = elt.closest('.feed-container');
         this.recordCount = recordCount;
+
+        this.nextScrollAllowedTime = 0;
 
         var self = this;
 
@@ -28,36 +34,143 @@
         }
 
         this.initKeyboardNavigation();
-        this.populateWaypoints(onLoaded, onDone);
+        // this.populateWaypoints(onLoaded, onDone);
+        this.considerPopulatingWaypoints(false, null, onLoaded);
         this.initEventHandlers();
     }
 
-    WaypointLoader.prototype.populateWaypoints = function (load_callback, done_callback) {
+    WaypointLoader.prototype.findClosestElement = function (elements) {
         var self = this;
 
-        if (!load_callback) {
-            load_callback = $.noop
+        if (elements.length <= 1) {
+            return 0;
         }
+
+        var containerTop = self.wrapper.offset().top;
+        var closestTop = elements.first().offset().top - containerTop;
+
+        var startSearch = 0;
+        var endSearch = elements.length - 1;
+
+        var topOf = function (elt) {
+            return elt.getBoundingClientRect().top - containerTop;
+        };
+
+        if (topOf(elements[startSearch]) <= 0 && topOf(elements[endSearch]) <= 0) {
+            /* We're at the end */
+            return endSearch;
+        }
+
+        while (
+            startSearch + 1 < endSearch &&
+                topOf(elements[startSearch]) < 0 &&
+                topOf(elements[endSearch]) > 0
+        ) {
+            var midIdx = Math.floor((endSearch - startSearch) / 2) + startSearch;
+
+            var midElement = elements[midIdx];
+            var midElementTop = topOf(midElement);
+
+            if (midElementTop > 0) {
+                endSearch = midIdx;
+            } else if (midElementTop <= 0) {
+                startSearch = midIdx;
+            }
+        }
+
+        if (
+            Math.abs(topOf(elements[startSearch])) <
+            Math.abs(topOf(elements[endSearch]))
+        ) {
+            return startSearch;
+        } else {
+            return endSearch;
+        }
+    };
+
+    var populateRunning = false;
+
+    WaypointLoader.prototype.considerPopulatingWaypoints = function (
+        preserveScroll,
+        reentrant,
+        done_callback
+    ) {
+        var self = this;
 
         if (!done_callback) {
-            done_callback = $.noop
+            done_callback = $.noop;
         }
 
-        var waypointElts = self.elt.find('.waypoint:not(.populated)');
+        if (populateRunning && !reentrant) {
+            return;
+        }
 
-        waypointElts.addClass('populated');
+        populateRunning = true;
 
-        self.elt.attr('aria-busy', 'true');
+        var waypoints = self.elt.find('.waypoint:not(.populated)');
+        var closestIdx = self.findClosestElement(waypoints);
+        var containerTop = self.wrapper.offset().top;
+
+        if (
+            waypoints.length > 0 &&
+                Math.abs(
+                    waypoints[closestIdx].getBoundingClientRect().top - containerTop
+                ) < LOAD_THRESHOLD_PX
+        ) {
+            var start = Math.max(closestIdx - BATCH_SIZE / 2, 0);
+            var end = start + BATCH_SIZE;
+
+            self.populateWaypoints(
+                waypoints.slice(start, end),
+                preserveScroll,
+                function () {
+                    done_callback();
+                    populateRunning = false;
+                    // self.considerPopulatingWaypoints(preserveScroll, true, done_callback);
+                }
+            );
+        } else {
+            done_callback();
+            populateRunning = false;
+        }
+    };
+
+    WaypointLoader.prototype.populateWaypoints = function (
+        waypointElts,
+        preserveScroll,
+        done_callback
+    ) {
+        var self = this;
+
+        if (!done_callback) {
+            done_callback = $.noop;
+        }
+
+        var populated_count = 0;
 
         $(waypointElts).each(function (_, waypoint) {
+            if (waypoint.classList.contains('populated')) {
+                populated_count++;
+
+                if (waypointElts.length <= populated_count) {
+                    done_callback();
+                }
+
+                return true;
+            }
+
+            waypoint.classList.add('populated');
+
             var waypointNumber = $(waypoint).data('waypoint-number');
             var waypointSize = $(waypoint).data('waypoint-size');
             var collectionSize = $(waypoint).data('collection-size');
             var uris = $(waypoint).data('uris').split(';');
 
-            $(waypoint).addClass('loading').attr('tabindex', '0');
+            self.elt.attr('aria-busy', 'true');
 
-            $.ajax(self.url_for('waypoints'), {
+            self.contextSummaryElt.find('.waypoint-loading-spinner').show();
+
+            $.ajax(self.url_for('waypoints.json'), {
                 method: 'GET',
                 data: {
                     urls: uris,
@@ -65,21 +178,41 @@
                     size: waypointSize,
                     collection_size: collectionSize,
                 },
-                async: true,
-            }).done(function (html) {
-                $(waypoint).html(html);
-                $(waypoint).removeClass('loading').removeAttr('tabindex');
+            }).done(function (records) {
+                const recordsToAppend = $('<div />');
 
-                load_callback();
+                $(uris).each(function (i, uri) {
+                    if (records[uri]) {
+                        recordNumber = waypointNumber * waypointSize + i;
+                        recordsToAppend.append(
+                            $('<div class="infinite-record-record" />')
+                                .attr('id', 'record-number-' + recordNumber)
+                                .data('record-number', recordNumber)
+                                .data('uri', uri)
+                                .html(records[uri])
+                        );
+                    }
+                });
 
-                $(waypoint).trigger('waypointloaded');
+                self.nextScrollAllowedTime = new Date().getTime() + 200;
+                $(waypoint).append(recordsToAppend.children());
+
+                if (preserveScroll) {
+                    $(waypoint)[0].scrollIntoView();
+                }
+
+                populated_count += 1;
+
+                if (waypointElts.length <= populated_count) {
+                    done_callback();
+                }
+
+                self.elt.removeAttr('aria-busy');
+                self.contextSummaryElt.find('.waypoint-loading-spinner').hide();
             });
         });
-
-        self.elt.removeAttr('aria-busy');
-
-        done_callback();
     };
+
 
     WaypointLoader.prototype.url_for = function (action) {
         var self = this;
@@ -94,6 +227,7 @@
         } else {
             var allRecords = this.elt.find('.infinite-record-record');
             var index = this.findClosestElement(allRecords);
+
             return $(allRecords.get(index));
         }
     };
@@ -131,12 +265,18 @@
                 $('#scrollContext').attr('title', $('#scrollContext .current-record-title').text().trim());
                 return;
             }
+        } else {
+            var current = this.getClosestElement(prioritiseFocused);
+            if (current && current.find('.infinite-item.infinite-item-resource').length > 0) {
+                $('#scrollContext .current-record-title').html($('#scrollContext').parent().find('.dropdown-menu a:first').html());
+                this.contextSummaryElt.find('.dropdown-menu a').removeAttr('aria-current');
+                this.contextSummaryElt.find('.dropdown-menu a:first').attr('aria-current', 'true');
+                $('#scrollContext').attr('title', $('#scrollContext .current-record-title').text().trim());
+            } else {
+                // do nothing
+                return;
+            }
         }
-
-        $('#scrollContext .current-record-title').html($('#scrollContext').parent().find('.dropdown-menu a:first').html());
-        this.contextSummaryElt.find('.dropdown-menu a').removeAttr('aria-current');
-        this.contextSummaryElt.find('.dropdown-menu a:first').attr('aria-current', 'true');
-        $('#scrollContext').attr('title', $('#scrollContext .current-record-title').text().trim());
     };
 
     WaypointLoader.prototype.scrollToRecord = function (recordNumber) {
@@ -146,6 +286,7 @@
         var targetWaypoint = Math.floor((recordNumber - 1) / waypointSize);
 
         var scrollTo = function (recordNumber) {
+            $('#record-number-' + recordNumber + ' > .infinite-item')[0].scrollIntoView({block: recordNumber === 0 ? 'start' : 'center'});
             $('#record-number-' + recordNumber + ' > .infinite-item').focus();
         };
 
@@ -168,7 +309,7 @@
         var self = this;
 
         if (uri.indexOf('/resources/') > 0) {
-            recordOffset = 0
+            self.scrollToRecord(0);
         } else {
             var $waypoint = self.wrapper.find('[data-uris*="'+uri+';"], [data-uris$="'+uri+'"]');
 
@@ -177,15 +318,19 @@
                 return;
             }
 
-            var uris = $waypoint.data('uris').split(';');
-            var index = $.inArray(uri, uris) + 1;
-            var waypoint_number = $waypoint.data('waypointNumber');
-            var waypoint_size = $waypoint.data('waypointSize');
-            var recordOffset = waypoint_number * waypoint_size + index;
+            const surroundingWaypoints = $waypoint.prevAll('.waypoint').slice(0, 1).add($waypoint).add($waypoint.nextAll('.waypoint').slice(0, 2));
+
+            self.nextScrollAllowedTime = new Date().getTime() + 2000;
+
+            this.populateWaypoints(surroundingWaypoints, false, function () {
+                setTimeout(function () {
+                    self.wrapper.find(".infinite-item[data-uri='" + uri + "']")[0].focus();
+                    self.wrapper.find(".infinite-item[data-uri='" + uri + "']")[0].parentNode.scrollIntoView({block: 'center'});
+                    self.updateContextSummary();
+                }, 200);
+            });
         }
 
-        self.scrollToRecord(recordOffset);
-        
         self.updateHash(uri);
     };
 
@@ -226,6 +371,8 @@
             })
         });
 
+        var scrollTimer = undefined;
+
         $(window).on('scroll', function() {
             if (window.scrollY > self.elt.offset().top) {
                 self.contextSummaryElt.addClass('fixed');
@@ -236,6 +383,16 @@
             }
 
             self.updateContextSummary();
+
+            if (scrollTimer) {
+                clearInterval(scrollTimer);
+            }
+
+            scrollTimer = setTimeout(function () {
+                if (new Date().getTime() > self.nextScrollAllowedTime) {
+                    self.considerPopulatingWaypoints(true);
+                }
+            }, SCROLL_DELAY_MS);
         });
 
     }

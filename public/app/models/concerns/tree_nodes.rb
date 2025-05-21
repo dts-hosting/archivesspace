@@ -61,6 +61,16 @@ module TreeNodes
     }).compact
   end
 
+  def ancestors_with_level
+    ancestors.reverse.map do |ancestor|
+      {
+        :ref => ancestor['uri'],
+        :level => ancestor['level'],
+      }
+    end
+  end
+
+
   private
 
   def id

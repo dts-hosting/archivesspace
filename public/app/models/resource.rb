@@ -186,6 +186,10 @@ class Resource < Record
     archives_space_client.get_all_series(uri)
   end
 
+  def ancestors_with_level
+    []
+  end
+
   private
 
   def parse_digital_instance
