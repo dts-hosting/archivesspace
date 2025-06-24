@@ -207,6 +207,7 @@
                     done_callback();
                 }
 
+                $(waypoint).trigger('waypointloaded');
                 self.elt.removeAttr('aria-busy');
                 self.contextSummaryElt.find('.waypoint-loading-spinner').hide();
             });
