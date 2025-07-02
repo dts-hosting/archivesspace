@@ -56,7 +56,8 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store
+  config.cache_store = :file_store, File.join(AppConfig[:data_directory], "tmp"), { size: 512.megabytes }
+  config.middleware.delete Rack::ETag
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
