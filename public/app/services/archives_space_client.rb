@@ -148,9 +148,15 @@ class ArchivesSpaceClient
       request = Net::HTTP::Post.new(url)
       Rails.logger.debug("POST Search url: #{url} ")
     end
-    response = Rails.cache.fetch(cache_key(url), expires_in: 5.minutes) do
-      do_http_request(request)
+
+    if AppConfig[:pui_cache_solr_responses]
+      response = Rails.cache.fetch(cache_key(url), expires_in: AppConfig[:pui_cache_solr_expiry_minutes].minutes) do
+        do_http_request(request)
+      end
+    else
+      response = do_http_request(request)
     end
+
     if response.code.to_s != '200'
       raise RequestFailedException.new("#{response.code}: #{response.body}")
     end

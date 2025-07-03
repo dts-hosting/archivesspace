@@ -762,6 +762,12 @@ AppConfig[:pui_pdf_font_name] = "Kurinto Text,Kurinto Text JP,Kurinto Text KR,Ku
 AppConfig[:pui_pdf_paragraph_line_height] = "125%"
 AppConfig[:pui_pdf_title_line_height] = "140%"
 
+# Cache settings for the PUI
+AppConfig[:pui_cache_control] = "max-age=0, private, must-revalidate" # can use: "public, max-age=3600" etc.
+AppConfig[:pui_cache_size_mb] = 512 # size of file store cache in megabytes
+AppConfig[:pui_cache_solr_expiry_minutes] = 5
+AppConfig[:pui_cache_solr_responses] = false # enabled will cache all Solr responses for `expiry_minutes`
+
 # Password recovery - requires email configuration
 # See example email configuration above
 AppConfig[:allow_password_reset] = false

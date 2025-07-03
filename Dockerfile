@@ -54,6 +54,10 @@ COPY --from=build_release /archivesspace /archivesspace
 RUN apt-get update && \
   apt-get -y install --no-install-recommends \
   ca-certificates \
+  fontconfig \
+  fonts-dejavu-core \
+  fonts-dejavu \
+  fonts-liberation \
   git \
   libharfbuzz0b \
   libjemalloc2 \

@@ -8,7 +8,6 @@ module Cacheable
   private
 
   def set_cache_headers
-    # Cache for 1 hour, public
-    response.headers['Cache-Control'] = 'public, max-age=3600'
+    response.headers["Cache-Control"] = AppConfig[:pui_cache_control]
   end
 end

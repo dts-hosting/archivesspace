@@ -56,8 +56,10 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
-  config.cache_store = :file_store, File.join(AppConfig[:data_directory], "tmp"), { size: 512.megabytes }
-  config.middleware.delete Rack::ETag
+  cache_directory = File.join(AppConfig[:data_directory], "tmp", "cache")
+  FileUtils.mkdir_p(cache_directory)
+  config.cache_store = :file_store, cache_directory, { size: AppConfig[:pui_cache_size_mb].to_i.megabytes }
+  config.middleware.delete Rack::ETag # The PUI generates a unique ETag per page, per request so disable this
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
