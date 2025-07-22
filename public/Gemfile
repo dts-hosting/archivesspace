@@ -79,3 +79,9 @@ end
 # Allow plugins to provide their own Gemfiles too.
 require 'asutils'
 ASUtils.load_plugin_gems(self)
+
+# cache
+gem 'dalli'
+
+# aspace-recaptcha
+gem 'recaptcha'
