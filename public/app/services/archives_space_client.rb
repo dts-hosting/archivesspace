@@ -154,15 +154,19 @@ class ArchivesSpaceClient
       request = Net::HTTP::Post.new(url)
       Rails.logger.debug("POST Search url: #{url} ")
     end
-    response = do_http_request(request)
-    if response.code != '200'
-      Rails.logger.debug("Code: #{response.code}")
+    response = Rails.cache.fetch(cache_key(url), expires_in: 5.minutes) do
+      do_http_request(request)
+    end
+    if response.code.to_s != '200'
       raise RequestFailedException.new("#{response.code}: #{response.body}")
     end
     results = ASUtils.json_parse(response.body)
     results
   end
 
+  def cache_key(url)
+    Digest::SHA256.hexdigest("#{AppConfig[:public_proxy_url]}|#{url}")
+  end
 
   # Authenticate to ArchivesSpace and grab a session token.  If @session isn't
   # nil, this won't do anything.  If multiple threads attempt to log in at the

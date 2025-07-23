@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include Cacheable
   include ManipulateNode
   helper_method :process_mixed_content
   helper_method :strip_mixed_content
