@@ -1,0 +1,47 @@
+name: Build and push ArchivesSpace Hosting Docker Image
+
+on:
+  push:
+    branches:
+      - "v*-hosting-p*"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Configs
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::388502511949:role/github_actions
+          role-session-name: oidc
+
+      - name: Switch role to aspace (hosting) account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::513816696638:role/DevOpsRole
+          role-session-name: aspace
+          role-chaining: true
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        id: login-ecr
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: archivesspace
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          # Remove 'v' prefix from branch name for image tag
+          TAG_NAME=${IMAGE_TAG#v}
+          docker build --platform linux/amd64 -t $REGISTRY/$REPOSITORY:$TAG_NAME .
+          docker push $REGISTRY/$REPOSITORY:$TAG_NAME
