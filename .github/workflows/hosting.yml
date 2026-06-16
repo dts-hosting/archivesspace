@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout Configs
         uses: actions/checkout@v4
@@ -43,5 +43,5 @@ jobs:
         run: |
           # Remove 'v' prefix from branch name for image tag
           TAG_NAME=${IMAGE_TAG#v}
-          docker build --platform linux/amd64 -t $REGISTRY/$REPOSITORY:$TAG_NAME .
+          docker build --platform linux/arm64 -t $REGISTRY/$REPOSITORY:$TAG_NAME .
           docker push $REGISTRY/$REPOSITORY:$TAG_NAME
