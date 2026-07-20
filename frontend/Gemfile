@@ -82,3 +82,14 @@ require 'asutils'
 ASUtils.load_plugin_gems(self)
 
 gem "zxcvbn-ruby", "~> 1.2"
+
+### Hosting additions
+
+# aspace-oauth (frontend)
+gem "omniauth", "~> 2.1", ">= 2.1.4", require: false
+gem "omniauth-cas", "~> 3.0", ">= 3.0.2", require: false
+gem "omniauth-rails_csrf_protection", "~> 2.0", ">= 2.0.1", require: false
+gem "omniauth-saml", "~> 2.2", ">= 2.2.5", require: false
+
+# aspace-recaptcha (public)
+gem "recaptcha"

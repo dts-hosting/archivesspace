@@ -68,3 +68,16 @@ gem "write_xlsx"
 gem 'xlsx_streaming_reader', git: 'https://github.com/hudmol/xlsx_streaming_reader.git'
 
 gem "date", '3.3.3' # for compatibility with bundler 2.6.9
+
+### Hosting additions
+
+# reports-api [nypl]
+gem "fmrest", "0.2.4"
+
+# timewalk
+gem "timetwister", "0.2.7"
+
+# yale_accession_marc_export [yale]
+gem "aws-sdk-s3", "~> 1"
+gem "marc", "~> 1.1.1"
+gem "unf", "0.1.4"
