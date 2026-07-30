@@ -63,7 +63,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/* && \
   ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
   groupadd -g 1000 archivesspace && \
-  useradd -l -M -u 1000 -g archivesspace archivesspace && \
+  useradd -l -m -u 1000 -g archivesspace archivesspace && \
   chown -R archivesspace:archivesspace /archivesspace
 
 USER archivesspace
