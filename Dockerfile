@@ -45,7 +45,7 @@ ENV ARCHIVESSPACE_LOGS=/dev/null \
   DEBIAN_FRONTEND=noninteractive \
   JDK_JAVA_OPTIONS="--add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED" \
   LANG=C.UTF-8 \
-  LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2 \
+  LD_PRELOAD=/usr/local/lib/libjemalloc.so \
   TZ=UTC
 
 COPY --from=build_release /archivesspace /archivesspace
@@ -61,6 +61,7 @@ RUN apt-get update && \
   wget \
   unzip && \
   rm -rf /var/lib/apt/lists/* && \
+  ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
   groupadd -g 1000 archivesspace && \
   useradd -l -M -u 1000 -g archivesspace archivesspace && \
   chown -R archivesspace:archivesspace /archivesspace
